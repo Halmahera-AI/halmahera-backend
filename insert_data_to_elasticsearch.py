@@ -5,12 +5,17 @@ from elasticsearch import Elasticsearch, helpers
 from langchain_ibm import WatsonxEmbeddings
 from ibm_watsonx_ai.metanames import EmbedTextParamsMetaNames
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv(dotenv_path="./.env", override=True)
+
 ES_INDEX = "scholarship_vector_index"
-WATSONX_API_KEY = "xMt9XF2DYD-_cgMVED8MdbRaIAmvRivseyqgA0ckHOA2" 
-WATSONX_URL = "https://us-south.ml.cloud.ibm.com"
-WATSONX_PROJECT_ID = "ded8280d-3252-426b-b8a5-992f0d1be904" 
-WATSONX_MODEL_ID = "ibm/granite-embedding-107m-multilingual"
-HOST_ELASTICSEARCH = "http://localhost:9200"
+HOST_ELASTICSEARCH = os.getenv('HOST_ELASTICSEARCH')
+WATSONX_API_KEY = os.getenv('WATSONX_API_KEY')
+WATSONX_URL = os.getenv('WATSONX_URL')
+WATSONX_PROJECT_ID = os.getenv('WATSONX_PROJECT_ID')
+WATSONX_MODEL_ID = os.getenv('WATSONX_MODEL_ID')
 
 try:
     es_client = Elasticsearch([HOST_ELASTICSEARCH])

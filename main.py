@@ -5,14 +5,13 @@ from ibm_watsonx_ai.metanames import EmbedTextParamsMetaNames
 from dotenv import load_dotenv
 import os
 
-load_dotenv(override=True)
+load_dotenv(dotenv_path="./.env", override=True)
 
 # =========================
 # KONFIGURASI DASAR
 # =========================
 ES_INDEX = "scholarship_vector_index"
-HOST_ELASTICSEARCH = "http://localhost:9200"
-
+HOST_ELASTICSEARCH = os.getenv('HOST_ELASTICSEARCH')
 WATSONX_API_KEY = os.getenv('WATSONX_API_KEY')
 WATSONX_URL = os.getenv('WATSONX_URL')
 WATSONX_PROJECT_ID = os.getenv('WATSONX_PROJECT_ID')
