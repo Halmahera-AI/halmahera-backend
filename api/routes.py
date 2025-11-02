@@ -11,7 +11,7 @@ def get_all_scholarships(limit: int = 100):
     return ScholarshipController.get_all_scholarships(limit)
 
 @router.get("/search")
-def search_scholarship(query: str = Query(..., description="Teks pencarian"), k: int = 5):
+def search_scholarship(query: str = Query(..., description="Teks pencarian"), k: int = 10):
     """Endpoint untuk melakukan pencarian berbasis KNN di Elasticsearch."""
     return ScholarshipController.search_scholarship(query, k)
 
