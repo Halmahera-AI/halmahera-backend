@@ -10,7 +10,7 @@ router = APIRouter()
 def get_all_scholarships(limit: int = 100):
     """
     Retrieve a list of all available scholarships.
-    The model should summarize or present scholarship options clearly to the user.
+    The model should present scholarship options clearly and concisely.
     Limit the result to 100 items per request to avoid information overload.
     """
     return ScholarshipController.get_all_scholarships(limit)
@@ -18,43 +18,43 @@ def get_all_scholarships(limit: int = 100):
 @router.get("/search")
 def search_scholarship(query: str = Query(..., description="Search query text")):
     """
-    Search for scholarships that best match the user's input query using Elasticsearch.
+    Search for scholarships that best match the user's input query using semantic search.
 
-    Steps:
-    1. Return a clear, easy-to-read list of the most relevant scholarships.
-    2. Ask the user if they want to apply for any specific scholarship.
-    3. If the user selects a scholarship, guide them to create a new application via the create_application endpoint.
+    CRITICAL FLOW CONTROL:
+    - ONLY return the most relevant scholarships that match the user's query precisely
+    - DO NOT include scholarships from unrelated countries or fields
+    - After presenting results, ask the user if they want to apply for any specific scholarship
+    - DO NOT proceed to any other steps until user selects a scholarship
 
-    The model should:
-    - Interpret the query semantically (not just keyword-based).
-    - Present results in a user-friendly format (e.g., bullet points with key details such as name, deadline, and eligibility).
-    - Only ask about applications after presenting the list.
-    - Explain that the next step is filling out the application for the chosen scholarship.
-    
-    Note: This endpoint is the first step in a multi-step flow that continues to create_application and create_task.
+    The model must:
+    - Filter results strictly based on query semantics (e.g., "Sweden" should only show Swedish scholarships)
+    - Present results in clear bullet points with: name, deadline, eligibility, country
+    - Wait for user to explicitly choose a scholarship before suggesting next steps
+    - Only mention application process AFTER user selects a specific scholarship
     """
     return ScholarshipController.search_scholarship(query, k=10)
 
 @router.post("/applications")
 async def create_application(application_data: ApplicationCreate):
     """
-    Create a new scholarship application record for the scholarship selected by the user.
+    Create a new scholarship application record for the user's selected scholarship.
 
-    Steps:
-    1. Guide the user through filling in all required fields for the selected scholarship.
-    2. Proactively ask for clarification if any information is missing or unclear.
-    3. After successful creation, confirm to the user that they have been successfully registered for the chosen scholarship.
-    4. Provide a brief summary of the submitted application (e.g., scholarship name, deadlines, next steps).
-    5. Ask the user if they want to create a personalized preparation plan (task roadmap) for this scholarship, including suggested tasks and timelines.
+    STRICT FLOW SEQUENCE:
+    1. Guide user through filling ALL required fields for the chosen scholarship
+    2. Proactively ask for clarification if information is missing
+    3. After successful creation, CONFIRM successful registration
+    4. Provide brief summary: scholarship name, deadlines, next steps
+    5. Ask user if they want to create a personalized preparation plan (task roadmap)
 
-    The model should:
-    - Ensure the user understands each step and provide guidance when needed.
-    - Only suggest creating a task roadmap after confirming with the user.
-    
-    Note: This endpoint continues the interactive flow started by search_scholarship and can lead to create_task if the user agrees.
+    CRITICAL RULES:
+    - DO NOT call create_task endpoint from here
+    - DO NOT suggest creating tasks until AFTER application is confirmed
+    - ONLY ask about task roadmap creation after confirming application success
+    - Wait for user's explicit agreement before proceeding to task creation
+
+    This continues the flow: search_scholarship → [user selects] → create_application
     """
     return await ApplicationController.create_application(application_data)
-
 
 @router.get("/applications")
 async def list_applications():
@@ -77,24 +77,23 @@ async def create_task(task_data: TaskCreate):
     """
     Create a new task roadmap for the user's scholarship application process.
 
-    Steps:
-    1. Ask the user if they want a detailed task plan based on their chosen scholarship.
-    2. If the user agrees, help define specific tasks with start and end dates.
-    3. Suggest realistic deadlines and organize tasks to optimize the scholarship preparation process.
-    4. Encourage the user to confirm or adjust each task as needed.
-    5. Optionally summarize the full task roadmap once created.
+    STRICT FLOW REQUIREMENTS:
+    - This endpoint should ONLY be called AFTER:
+      1. User has successfully created an application AND
+      2. LLM has confirmed the application was registered AND  
+      3. LLM has asked if user wants a preparation plan AND
+      4. User has explicitly agreed to create a task roadmap
 
-    The model should:
-    - Guide the user step-by-step in creating each task.
-    - Ensure clarity and confirm the user's agreement before finalizing the roadmap.
-    - Remain flexible: after completing this step, the user may still ask for
-      - Details about scholarships they have already applied for,
-      - Task progress or summaries,
-      - Searching or applying for other scholarships.
-    - Handle such queries by referencing the relevant endpoints or data without restarting the main flow unnecessarily.
-    
-    Note: This endpoint is the final step in the interactive flow starting from search_scholarship → create_application, 
-    but the user can still perform other queries or continue exploring additional options.
+    Steps:
+    1. Help define specific tasks with start and end dates based on scholarship deadline
+    2. Suggest realistic deadlines organized to optimize preparation
+    3. Encourage user to confirm or adjust each task
+    4. Summarize the full task roadmap once created
+
+    The model must:
+    - Ensure user understands this is a separate step from application creation
+    - Guide step-by-step in creating each task
+    - Confirm user agreement before finalizing roadmap
     """
     return await ApplicationController.create_task(task_data)
 
