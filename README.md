@@ -1,4 +1,4 @@
-# Halmahera AI - Scholarship Search API
+# Halmahera AI - Scholarship Backend
 
 A FastAPI-based scholarship search and application management system powered by IBM Watson AI and Elasticsearch.
 
