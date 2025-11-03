@@ -59,8 +59,15 @@ class ApplicationService:
         """Membuat task baru untuk aplikasi"""
         try:
             task_id = str(uuid.uuid4())
+
+            # Konversi string (YYYY-MM-DD) ke datetime.date
+            start_date = datetime.strptime(task_data.start_date, "%Y-%m-%d").date()
+            end_date = datetime.strptime(task_data.end_date, "%Y-%m-%d").date()
+
             query = """
-                INSERT INTO scholarship_application_tasks (id, name, application_id, description, is_completed, start_date, due_date)
+                INSERT INTO scholarship_application_tasks (
+                    id, name, application_id, description, is_completed, start_date, due_date
+                )
                 VALUES ($1, $2, $3, $4, $5, $6, $7)
                 RETURNING *
             """
@@ -72,8 +79,8 @@ class ApplicationService:
                 task_data.application_id,
                 task_data.description,
                 task_data.is_completed,
-                task_data.start_date,
-                task_data.end_date,
+                start_date,
+                end_date,
             )
 
             return dict(result) if result else None

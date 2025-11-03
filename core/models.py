@@ -15,5 +15,11 @@ class TaskCreate(BaseModel):
     application_id: str
     description: Optional[str] = None
     is_completed: bool = False
-    start_date: datetime = Field(default_factory=datetime.now)
-    end_date: datetime = Field(default_factory=datetime.now)
+    start_date: str = Field(
+        ...,
+        description="The start date of the task in YYYY-MM-DD format. Example: 2025-11-13"
+    )
+    end_date: str = Field(
+        ...,
+        description="The start date of the task in YYYY-MM-DD format. Example: 2025-12-30"
+    )
