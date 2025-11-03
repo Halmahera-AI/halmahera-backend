@@ -150,18 +150,3 @@ The application follows a layered architecture:
 3. **Service Layer** (`service/`) - Core business operations
 4. **Core Layer** (`core/`) - Infrastructure and data models
 5. **Configuration** (`config/`) - Settings and environment management
-
-## 🧪 Testing
-
-Run tests with:
-```bash
-python -m pytest test/
-```
-
-## 📝 License
-
-[Add your license information here]
-
-## 🤝 Contributing
-
-[Add contribution guidelines here]
